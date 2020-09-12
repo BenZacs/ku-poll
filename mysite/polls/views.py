@@ -36,14 +36,7 @@ class ResultsView(generic.DetailView):
 
 def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-    template = loader.get_template('polls/index.html')from django.http import Http404, HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse
-from .models import Question, Choice
-from django.template import loader
-from django.views import generic
-from django.utils import timezone
-
+    template = loader.get_template('polls/index.html')
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
