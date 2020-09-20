@@ -17,12 +17,12 @@ class IndexView(generic.ListView):
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')
 
 
 class DetailView(generic.DetailView):
     model = Question
-    template_name = 'polls/detail.html'
+    template_name = 'polls/details.html'
 
     def get_queryset(self):
         """
@@ -37,28 +37,18 @@ class ResultsView(generic.DetailView):
 
 
 def index(request):
-    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    latest_question_list = Question.objects.order_by('-pub_date')[:]
     template = loader.get_template('polls/index.html')
     context = {'latest_question_list': latest_question_list, }
     return HttpResponse(template.render(context, request))
-
-
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
-
 
 def results(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/results.html', {'question': question})
 
-
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
-
-
 def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/detail.html', {'question': question})
+    return render(request, 'polls/details.html', {'question': question})
 
 
 def vote(request, question_id):
@@ -74,6 +64,9 @@ def vote(request, question_id):
         selected_choice.votes += 1
         selected_choice.save()
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+    
+    context = {'latest_question_list': latest_question_list,}
+    return HttpResponse(template.render(context, request))
 
 
 def vote_for_poll(request, pk):
@@ -81,4 +74,4 @@ def vote_for_poll(request, pk):
     if q.can_vote() == False:
         messages.error(request, "poll expires")
         return redirect('polls:index')
-    return render(request, "polls/detail.html", {"question": q})
+    return render(request, "polls/details.html", {"question": q})
