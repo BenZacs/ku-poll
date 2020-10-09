@@ -94,8 +94,7 @@ class QuestionIndexViewTests(TestCase):
         """
         create_question(question_text="Future question.", pub_date=30, end_date=32)
         response = self.client.get(reverse('polls:index'))
-        self.assertContains(response, "No polls are available.")
-        self.assertQuerysetEqual(response.context['latest_question_list'], [])
+        self.assertQuerysetEqual(response.context['latest_question_list'], ['<Question: Future question.>'])
 
     def test_future_question_and_past_question(self):
         """
@@ -107,7 +106,7 @@ class QuestionIndexViewTests(TestCase):
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
             response.context['latest_question_list'],
-            ['<Question: Past question.>']
+            ['<Question: Future question.>','<Question: Past question.>']
         )
 
     def test_two_past_questions(self):
@@ -119,7 +118,7 @@ class QuestionIndexViewTests(TestCase):
         response = self.client.get(reverse('polls:index'))
         self.assertQuerysetEqual(
             response.context['latest_question_list'],
-            ['<Question: Past question 2.>', '<Question: Past question 1.>']
+            ['<Question: Past question 1.>', '<Question: Past question 2.>']
         )
 
 
@@ -133,7 +132,7 @@ class QuestionDetailViewTests(TestCase):
             question_text='Future question.', pub_date=5, end_date=15)
         url = reverse('polls:detail', args=(future_question.id,))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
     def test_past_question(self):
         """
