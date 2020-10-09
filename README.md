@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/BenZacs/ku-polls.svg?branch=master)](https://travis-ci.com/github/BenZacs/ku-polls)
 # ku-poll
 Web application for conducting online polls and surveys
 
