@@ -55,7 +55,7 @@ class QuestionModelTests(TestCase):
 
 
 class QuestionIndexViewTests(TestCase):
-    """Test quesition in th index page."""
+    """Test quesition in the index page."""
 
     def test_no_questions(self):
         """If no questions exist, an appropriate message is displayed."""

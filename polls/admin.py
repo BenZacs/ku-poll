@@ -3,6 +3,8 @@ from .models import Choice, Question
 
 
 class QuestionAdmin(admin.ModelAdmin):
+    """Create question for poll."""
+
     fieldsets = [
         (None, {'fields': ['question_text']}),
         ('Date information', {'fields': ['pub_date', 'end_date'], 'classes': ['collapse']}), ]
@@ -12,6 +14,8 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 class ChoiceInline(admin.TabularInline):
+    """Create choice for poll."""
+
     model = Choice
     extra = 3
 
