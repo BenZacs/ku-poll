@@ -4,6 +4,7 @@ from django.utils import timezone
 
 
 class Question(models.Model):
+    """Model to creata"""
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
     end_date = models.DateTimeField('ending date', default=timezone.now() + datetime.timedelta(days=10))
