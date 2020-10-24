@@ -1,9 +1,11 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from .models import Question, Choice
+from .models import Question, Choice, Vote
 from django.template import loader
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
 
 
 def index(request):
@@ -23,7 +25,7 @@ def detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     return render(request, 'polls/details.html', {'question': question})
 
-
+@login_required
 def vote(request, question_id):
     """Update the vote for choice that have been voted."""
     question = get_object_or_404(Question, pk=question_id)
@@ -42,7 +44,7 @@ def vote(request, question_id):
     context = {'latest_question_list': latest_question_list, }
     return HttpResponse(template.render(context, request))
 
-
+@login_required
 def vote_for_poll(request, pk):
     """Check the poll is avalable to vote."""
     q = Question.objects.get(pk=pk)

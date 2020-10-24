@@ -13,7 +13,7 @@
         {% if latest_question_list %}
             <ul>
             {% for question in latest_question_list %}
-                    <p >{{ question.question_text }}</p>
+                    <p>{{ question.question_text }}</p>
                     {% if question.can_vote %}
                     <button>
                         <a href="{% url 'polls:detail' question.id %}">vote</a> 
