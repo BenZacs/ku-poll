@@ -9,12 +9,21 @@
         <th>Votes</th>
     </tr>
         {% for choice in question.choice_set.all %}
-                <tr>
-                    <td>{{ choice.choice_text }}</td>
-                    <td>{{ choice.votes }}<a> vote </a></td>
-                </tr>
+            <tr>
+                <td>{{ choice.choice_text }}</td>
+                <td>{{ choice.votes }}<a> vote </a></td>
+            </tr>
         {% endfor %}
     </table>
+    {% if user_exist %}
+        <span>{{ request.user }} has voted 
+            {% for vote in user_vote %}
+                {{ vote.choice }}
+            {% endfor %}
+        </span>
+    {% else %}
+        <span>You didn't vote for this polls</span>
+    {% endif %}
     </ul>
     <button>
          <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
