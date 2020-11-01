@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -18,7 +19,8 @@ def index(request):
 def results(request, question_id):
     """Create the result page."""
     question = get_object_or_404(Question, pk=question_id)
-    return render(request, 'polls/results.html', {'question': question})
+    user_exist = Vote.objects.filter(pk=question_id, user_id=request.user.id).exists()
+    return render(request, 'polls/results.html', {'question': question, 'user_exist': user_exist})
 
 def detail(request, question_id):
     """Create the dtail page."""
@@ -30,25 +32,53 @@ def vote(request, question_id):
     """Update the vote for choice that have been voted."""
     question = get_object_or_404(Question, pk=question_id)
     try:
+        configure()
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
+        configure()
+        # Redisplay the question voting form.
         return render(request, 'polls/detail.html', {
             'question': question,
             'error_message': "You didn't select a choice.",
         })
     else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        if Vote.objects.filter(pk=question_id, user_id=request.user.id).exists():
+            configure()
+            user_vote = question.vote_set.get(user=request.user)
+            user_vote.choice = selected_choice
+            user_vote.choice.votes += 1
+            user_vote.choice.save()
+            user_vote.save()
+        else:
+            configure()
+            selected_choice.vote_set.create(user=request.user, question=question)
 
-    context = {'latest_question_list': latest_question_list, }
-    return HttpResponse(template.render(context, request))
+        return HttpResponseRedirect(reverse('polls:results', args=(question_id,)))
 
 @login_required
-def vote_for_poll(request, pk):
+def vote_for_poll(request, question_id):
     """Check the poll is avalable to vote."""
-    q = Question.objects.get(pk=pk)
+    question = Question.objects.get(pk=question_id)
     if not(q.can_vote()):
         messages.error(request, "poll expires")
         return redirect('polls:index')
-    return render(request, "polls/details.html", {"question": q})
+    return render(request, "polls/details.html", {"question": question})
+
+def show_vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    user_vote = Vote.objects.filter(pk=question_id, user_id=request.user.id)
+    user_exist = Vote.objects.filter(pk=question_id, user_id=request.user.id).exists()
+    return render(request, 'polls/results.html', {'question': question, 'user_vote': user_vote, 'user_exist': user_exist})
+
+def configure():
+    filehandler = logging.FileHandler("demo.log")
+    filehandler.setLevel(logging.NOTSET)
+    formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
+    filehandler.setFormatter(formatter)
+    root = logging.getLogger()
+    root.addHandler(filehandler)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.WARNING)
+    formatter = logging.Formatter(fmt='%(levelname)-8s %(name)s: %(message)s')
+    console_handler.setFormatter(formatter)
+    root.addHandler(console_handler)

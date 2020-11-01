@@ -4,12 +4,15 @@
             Poll Questions
         </p>
         {% if messages %}
-        <ul class="messages">
-        {% for msg in messages %}
-            <li class="{{msg.tags}}">{{ msg }}</li>
-        {% endfor %}
-        </ul>
+            <ul class="messages">
+            {% for msg in messages %}
+                <li class="{{msg.tags}}">{{ msg }}</li>
+            {% endfor %}
+            </ul>
         {% endif %}
+            <h1>{% if user.is_authenticated %} for {{ user.username }}
+            <a href="{% url 'logout' %}" class="button">Logout</a>{% else %}
+            <a href="{% url 'login' %}" class="button">Login</a>{% endif %}</h1>
         {% if latest_question_list %}
             <ul>
             {% for question in latest_question_list %}
