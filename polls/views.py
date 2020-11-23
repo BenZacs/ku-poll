@@ -32,10 +32,8 @@ def vote(request, question_id):
     """Update the vote for choice that have been voted."""
     question = get_object_or_404(Question, pk=question_id)
     try:
-        configure()
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
-        configure()
         # Redisplay the question voting form.
         return render(request, 'polls/detail.html', {
             'question': question,
@@ -43,16 +41,13 @@ def vote(request, question_id):
         })
     else:
         if Vote.objects.filter(pk=question_id, user_id=request.user.id).exists():
-            configure()
             user_vote = question.vote_set.get(user=request.user)
             user_vote.choice = selected_choice
             user_vote.choice.votes += 1
             user_vote.choice.save()
             user_vote.save()
         else:
-            configure()
             selected_choice.vote_set.create(user=request.user, question=question)
-
         return HttpResponseRedirect(reverse('polls:results', args=(question_id,)))
 
 @login_required
@@ -70,15 +65,3 @@ def show_vote(request, question_id):
     user_exist = Vote.objects.filter(pk=question_id, user_id=request.user.id).exists()
     return render(request, 'polls/results.html', {'question': question, 'user_vote': user_vote, 'user_exist': user_exist})
 
-def configure():
-    filehandler = logging.FileHandler("demo.log")
-    filehandler.setLevel(logging.NOTSET)
-    formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
-    filehandler.setFormatter(formatter)
-    root = logging.getLogger()
-    root.addHandler(filehandler)
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.WARNING)
-    formatter = logging.Formatter(fmt='%(levelname)-8s %(name)s: %(message)s')
-    console_handler.setFormatter(formatter)
-    root.addHandler(console_handler)
